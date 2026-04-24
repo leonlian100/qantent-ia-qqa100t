@@ -1,1 +1,20 @@
-
+[
+  {
+    "id": "US1",
+    "title": "Robot system",
+    "abstract": "robot control using sensor and AI",
+    "assignee": "Tesla"
+  },
+  {
+    "id": "US2",
+    "title": "Automation device",
+    "abstract": "automation system using cloud",
+    "assignee": "Google"
+  },
+  {
+    "id": "US3",
+    "title": "Cutting machine",
+    "abstract": "cutting blade with motor control",
+    "assignee": "Bosch"
+  }
+]
