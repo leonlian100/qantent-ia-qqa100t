@@ -10,3 +10,9 @@ CREATE TABLE IF NOT EXISTS patents (
     assignee TEXT
 )
 """)
+conn.execute(
+    "INSERT INTO patents (title, abstract) VALUES (?, ?)",
+    (title, abstract)
+)
+conn.commit()
+
