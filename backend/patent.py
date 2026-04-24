@@ -1,10 +1,11 @@
-import json
+import sqlite3
 
 def get_patents(query):
-    with open("data/patents.json", encoding="utf-8") as f:
-        data = json.load(f)
+    conn = sqlite3.connect("patents.db")
 
-    return [
-        p for p in data
-        if query.lower() in p["abstract"].lower()
-    ][:50]
+    cur = conn.execute(
+        "SELECT title, abstract FROM patents WHERE abstract LIKE ? LIMIT 50",
+        (f"%{query}%",)
+    )
+
+    return [{"title": r[0], "abstract": r[1]} for r in cur.fetchall()]
