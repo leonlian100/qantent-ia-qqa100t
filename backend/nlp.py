@@ -1,30 +1,41 @@
 import matplotlib
 matplotlib.use("Agg")
 
+import jieba
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import os
 
-X_GLOBAL = None
+FONT_PATH = "fonts/NotoSansTC-Regular.otf"
+
+def tokenize(text):
+    return " ".join(jieba.cut(text))
 
 def analyze_texts(texts):
-    global X_GLOBAL
+    # 🔥 中文斷詞
+    texts_cut = [tokenize(t) for t in texts]
 
-    vec = TfidfVectorizer(stop_words="english", max_features=20)
-    X = vec.fit_transform(texts)
+    vectorizer = TfidfVectorizer(max_features=20)
+    X = vectorizer.fit_transform(texts_cut)
 
-    X_GLOBAL = X
-
-    keywords = vec.get_feature_names_out()
+    keywords = vectorizer.get_feature_names_out()
     scores = X.sum(axis=0).A1
 
     keyword_scores = dict(zip(keywords, scores))
 
     os.makedirs("output", exist_ok=True)
 
-    WordCloud().generate(" ".join(texts)).to_file("output/wordcloud.png")
+    # 🔥 文字雲（支援中文）
+    WordCloud(
+        font_path=FONT_PATH,
+        width=800,
+        height=400
+    ).generate(" ".join(texts_cut)).to_file("output/wordcloud.png")
+
+    # 🔥 matplotlib 中文
+    plt.rcParams["font.family"] = "sans-serif"
+    plt.rcParams["font.sans-serif"] = ["Noto Sans TC"]
 
     plt.figure()
     plt.bar(keyword_scores.keys(), keyword_scores.values())
@@ -33,9 +44,4 @@ def analyze_texts(texts):
     plt.savefig("output/tfidf.png")
     plt.close()
 
-    return keyword_scores, X
-
-def get_similarity(idx):
-    global X_GLOBAL
-    sim = cosine_similarity(X_GLOBAL[idx], X_GLOBAL)[0]
-    return sim.argsort()[-5:].tolist()
+    return keyword_scores
